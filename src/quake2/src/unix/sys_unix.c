@@ -36,6 +36,8 @@
 
 #ifdef __APPLE__
 #include <mach/mach_time.h>
+#include <mach-o/dyld.h>
+#include <libgen.h>
 #endif
 
 #include <sys/select.h>
@@ -233,6 +235,24 @@ qboolean Sys_GetWorkingDir(char* buffer, size_t len)
 	return false;
 }
 
+qboolean Sys_GetExecutableDir(char *dir, size_t size)
+{
+    char path[PATH_MAX];
+    uint32_t len = sizeof(path);
+
+    if (_NSGetExecutablePath(path, &len) != 0)
+        return false;
+
+    char resolved[PATH_MAX];
+    if (realpath(path, resolved) == NULL)
+        return false;
+
+    char *d = dirname(resolved);
+
+	strlcpy(dir, d, size);
+    return true;
+}
+
 static DIR* finddir = NULL;
 static char findpath[MAX_OSPATH];
 static char findpattern[MAX_OSPATH];
@@ -381,8 +401,11 @@ qboolean Sys_GetOSUserDir(char* buffer, size_t len)
 	char* home = getenv("HOME");
 	if (!home)
 		return false;
-
+#if defined(__APPLE__)
+	snprintf(buffer, len, "%s/Library/Application Support/Heretic2", home);
+#else
 	snprintf(buffer, len, "%s/.Heretic2R", home);
+#endif
 
 	if (!Sys_IsDir(buffer))
 		Sys_Mkdir(buffer);

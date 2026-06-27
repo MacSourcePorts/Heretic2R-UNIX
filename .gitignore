@@ -37,3 +37,4 @@
 /src/WinSnd/release
 *.user
 /stuff/unpack
+.DS_Store

@@ -787,7 +787,8 @@ void FS_InitFilesystem(void)
 	else
 	{
 		char workdir[MAX_OSPATH];
-		Sys_GetWorkingDir(workdir, sizeof(workdir)); //mxd. _getcwd() -> Sys_GetWorkingDir().
+		// Sys_GetWorkingDir(workdir, sizeof(workdir)); //mxd. _getcwd() -> Sys_GetWorkingDir().
+		Sys_GetExecutableDir(workdir, sizeof(workdir));
 
 		fs_basedir = Cvar_Get("basedir", workdir, CVAR_NOSET); // "C:\Games\Heretic2"
 	}
@@ -795,7 +796,22 @@ void FS_InitFilesystem(void)
 	//mxd. Skip fs_cddir / "-cddir" command line arg logic.
 
 	// Start up with 'base' by default.
-	FS_AddGameDirectory(va("%s/"BASEDIRNAME, fs_basedir->string));
+	// FS_AddGameDirectory(va("%s/"BASEDIRNAME, fs_basedir->string));
+
+	char basepath[MAX_OSPATH];
+	Com_sprintf(basepath, sizeof(basepath),  "%s/base", fs_basedir->string);
+	FS_AddGameDirectory(basepath);
+
+	#ifdef __APPLE__
+	{
+		char osdir[MAX_OSPATH];
+
+		if (Sys_GetOSUserDir(osdir, sizeof(osdir)))
+		{
+			FS_AddGameDirectory(va("%s/"BASEDIRNAME, osdir));
+		}
+	}
+	#endif
 
 	// Any set gamedirs will be freed up to here.
 	fs_base_searchpaths = fs_searchpaths;

@@ -220,6 +220,7 @@ qboolean Sys_IsDir(const char* path); // YQ2
 qboolean Sys_IsFile(const char* path); // YQ2
 qboolean Sys_GetWorkingDir(char* buffer, size_t len); // YQ2
 qboolean Sys_GetOSUserDir(char* buffer, size_t len); //mxd
+qboolean Sys_GetExecutableDir(char *dir, size_t size);
 
 // Directory searching.
 #define SFF_ARCH	0x01
