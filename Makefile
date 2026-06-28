@@ -6,7 +6,7 @@
 
 # Detect OS
 UNAME := $(shell uname -s)
-ARCH := $(shell uname -m)
+ARCH ?= $(shell uname -m)
 
 # Normalize architecture names
 ifeq ($(ARCH),i686)
@@ -95,8 +95,8 @@ ifeq ($(UNAME),OpenBSD)
 endif
 
 ifeq ($(UNAME),Darwin)
-  CFLAGS += -DMACOS_X -arch $(ARCH)
-  LDFLAGS := -arch $(ARCH)
+  CFLAGS += -DMACOS_X -arch $(ARCH) $(CFLAGS)
+  LDFLAGS := -arch $(ARCH) $(LDFLAGS)
   # Symbols referenced by plugins are resolved at dlopen time from the host exe.
   SHARED_LDFLAGS := -undefined dynamic_lookup
   SHARED_EXT := .dylib
